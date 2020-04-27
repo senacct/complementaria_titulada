@@ -1,0 +1,31 @@
+# Impedir que se pueda ver el listado de contenidos de un directorio
+#RewriteCond %{SERVER_PORT} 80 
+#RewriteRule ^(.*)$ https://senagalan.com/complementaria/$1 [R,L]
+#RewriteRule ^(.*)$ https:/localhost/complementaria/$1 [R,L]
+
+#Options All -Indexes
+
+# Url Amigables
+RewriteEngine On
+Options +FollowSymLinks
+RewriteRule ^([a-zA-Z0-9/]+)$ index.php?modulo=$1
+
+RewriteCond %{QUERY_STRING} .
+RewriteRule ^(/\d+/?)$ $1 [NC,QSD,L]
+
+#guarda en cache los archivos de la aplicación
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresByType image/gif A432000
+ExpiresByType image/jpg A432000
+ExpiresByType image/jpeg A432000
+ExpiresByType image/png A432000
+ExpiresByType image/ico A432000
+ExpiresByType image/bmp A432000
+ExpiresByType text/css A432000
+ExpiresByType text/javascript A432000
+ExpiresByType application/javascript A432000
+ExpiresByType application/x-javascript A432000
+</ifmodule>
+
+

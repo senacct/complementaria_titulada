@@ -1,0 +1,5 @@
+UPDATE bitacoraestados b SET b.visible = '0';
+
+UPDATE bitacoraestados b INNER JOIN  fcaracterizacion f ON b.idficha = f.id AND f.estado = b.estado WHERE MAX(b.id) SET b.visible = '1' ; 
+
+SELECT f.id, f.numero, b.visible from bitacoraestados b INNER JOIN  fcaracterizacion f ON b.idficha = f.id WHERE f.estado = b.estado 

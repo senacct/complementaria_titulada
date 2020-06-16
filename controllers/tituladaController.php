@@ -19,6 +19,10 @@ class TituladaController{
 	public static function lprogresultado(){
 	    $respuesta =  TituladaModel::lprogresultado();
  		return $respuesta;
+	}
+	public static function lresultadoPro($idProgramacion, $modificar){
+	    $respuesta =  TituladaModel::lresultadoPro($idProgramacion, $modificar);
+ 		return $respuesta;
 	}			
 	public static function traerlprogramas(){
 	    $respuesta =  TituladaModel::traerlprogramas();

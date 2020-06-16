@@ -265,7 +265,8 @@ switch ($dato) {
 				'idCompetencia' => filter_input(INPUT_POST, 'idCompetencia'),
 				'textCompetencia' => filter_input(INPUT_POST, 'textCompetencia'),
 				'textResultado' => filter_input(INPUT_POST, 'textResultado'),
-				'esTitulada' => filter_input(INPUT_POST, 'esTitulada')
+				'esTitulada' => filter_input(INPUT_POST, 'esTitulada'),
+				'esMultiple' => filter_input(INPUT_POST, 'esMultiple')
 
 
 		    ];
@@ -288,7 +289,8 @@ switch ($dato) {
 				'idResultado' => filter_input(INPUT_POST, 'idResultado'),
 				'idCompetencia' => filter_input(INPUT_POST, 'idCompetencia'),
 				'textCompetencia' => filter_input(INPUT_POST, 'textCompetencia'),
-				'textResultado' => filter_input(INPUT_POST, 'textResultado')
+				'textResultado' => filter_input(INPUT_POST, 'textResultado'),
+				'esTitulada' => filter_input(INPUT_POST, 'esTitulada')
 		    ];
 			echo $a->unselCalendario($arregloDatos); 
 			break;				

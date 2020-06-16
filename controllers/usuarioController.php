@@ -41,6 +41,10 @@ class GestionUsuarioController{
 		$respuesta = GestionUsuarioModel::listadoUsuariosSel();
 		return $respuesta;	 	
 	 }
+	 public static function listadoUsuariosSelFicha(){
+		$respuesta = GestionUsuarioModel::listadoUsuariosSelFicha();
+		return $respuesta;	 	
+	 }
      public static function getPerfiles($datos){
 		$respuesta = GestionUsuarioModel::getPerfiles($datos);
 		return $respuesta;	 	

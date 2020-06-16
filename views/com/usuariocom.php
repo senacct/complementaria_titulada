@@ -43,6 +43,11 @@ switch ($dato) {
 			    $respuesta = $a -> listadoUsuariosSel(); 
 				//echo 'Respuesta';
 				echo $respuesta;
+			break;	
+			case 'selprogramarFicha':				
+			    $respuesta = $a -> listadoUsuariosSelFicha(); 
+				//echo 'Respuesta';
+				echo $respuesta;
 			break;			
 			case 'getPerfiles':
 			    $datos = [

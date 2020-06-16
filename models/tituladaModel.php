@@ -54,7 +54,7 @@ $html = '';
 
 
 $ban = 0;
-     $sqlt = "SELECT DISTINCT fc.id, fr.nombre, fr.nivel, fc.numero, fc.lugar, pr.mes, pr.dia, pr.inicia, pr.finaliza, pr.fecha, pr.desCompetencia, pr.desResultado, pr.idResultado as idResultado, pr.idCompetencia as idCompetencia, pr.horas FROM formaciones fr INNER JOIN fcaracterizacion fc ON fr.id = fc.idprograma  INNER JOIN programacion pr ON fc.id = pr.idficha WHERE  fc.estado > 4 AND pr.estado = '1' AND pr.idinstructor = '$id' ORDER BY pr.mes, pr.dia, pr.inicia ;";
+     $sqlt = "SELECT DISTINCT fc.id, fr.nombre, fr.nivel, fc.numero, fc.lugar, pr.mes, pr.dia, pr.inicia, pr.finaliza, pr.fecha, pr.desCompetencia, pr.desResultado, pr.idResultado as idResultado, pr.idCompetencia as idCompetencia, pr.horas, pr.ID as idProgramacion,fc.formacion_Fuera FROM formaciones fr INNER JOIN fcaracterizacion fc ON fr.id = fc.idprograma  INNER JOIN programacion pr ON fc.id = pr.idficha WHERE  fc.estado > 4 AND pr.estado = '1' AND pr.idinstructor = '$id' ORDER BY pr.mes, pr.dia, pr.inicia ;";
      $stmt = Conexion::conectar()->prepare($sqlt);
      $stmt -> execute();
      if($stmt->rowCount() > 0){
@@ -112,19 +112,35 @@ for ($m = $mesInicio; $m < $mesFin + 1; $m++) {
                   //$html.= $f->activo('$idficha', $day, $m, $year, $ds, $festivo);
                   /********************/
                     $ban = 0;
-                    $dato = 'detalle <hr>';
+					$dato = 'detalle <hr>';
+
+					$html.= '<td id="b'.$m.'_'.$day.'">';
+					// $html.= $f->activo2($value['id'], $day, $m, $year, $ds, $festivo);
+
+					$html2 = '';
                     foreach ($registros as $key => $value){
                       if($value['mes'] == $m && $value['dia'] == $day){
 
 						//se suman las horas de este dia a la semana
 						$horasSemana += $value['horas'];
+						$classColor = 'bg-secondary';
+						if($value['formacion_Fuera'] == 1){
+							$classColor = 'bg-danger';
+						}
 
-                            $dato .= $value['numero'].'<br>'.$value['inicia'].':00 -'.$value['finaliza'].':00 <br>'.$value['lugar'].'<br>';
+                            $dato .='<strong> FICHA: </strong> ' . $value['numero'].'<br>  <strong> Horario: </strong> '.$value['inicia'].':00 -'.$value['finaliza'].':00 <br> <strong> Ambiente: </strong> '.$value['lugar'].'<br>';
 							if($value['nivel'] == '0' ){
 								$dato .= $value['nombre'].'<hr>';
 							}else{
-								$dato .= $value['desCompetencia'].'<br>';
-								$dato .= $value['desResultado'];
+								
+								$dato .= '<button id="res'.$value['mes'].'_'.$value['dia'].'_'.$value['inicia'].'_'.$value['finaliza'].'" ';
+									$dato .= 'onClick="verResultadosHorario('.$value['idProgramacion'].','.$modificar.')"';
+									$dato .= ' class="btn btn-primary text-white" ';
+									$dato .= ' type="button"> Consultar Resultados <i class="fas fa-list-ol"></i></button>';            
+
+								
+								// $dato .= $value['desCompetencia'].'<br>';
+								// $dato .= $value['desResultado'];
 
 								if($modificar == 1){
 									$dato .= '<button id="d'.$value['mes'].'_'.$value['dia'].'_'.$value['inicia'].'_'.$value['finaliza'].'" ';
@@ -133,19 +149,26 @@ for ($m = $mesInicio; $m < $mesFin + 1; $m++) {
 									$dato .= ' type="button"> Quitar <i class="far fa-calendar-times  "></i></button>';            
 								}
 
-								$dato .='<hr>';
+								$dato .='</hr>';
 								
 							}    
 
 							$ban = 1;
+							if($ban == 1){
+								$dato = substr($dato,0, strlen($dato) - 5);
+								$html2 .='<div class="card text-white '.$classColor.' mb-3 h6">'.$dato.'</div>';
+							  }
+
+							  $dato = "";
+							
                       }
 					}
 					//
-					$html.= '<td id="b'.$m.'_'.$day.'">';
+					
 					$html.= $f->activo2($value['id'], $day, $m, $year, $ds, $festivo);
                     if($ban == 1){
-                      $dato = substr($dato,0, strlen($dato) - 5);
-                      $html .='<div class="card text-white bg-secondary mb-3 h6">'.$dato.'</div>';
+                      //$dato = substr($dato,0, strlen($dato) - 5);
+                      $html .=$html2;
                     }
 					
 					$html .='</td>';
@@ -203,7 +226,7 @@ public static function verHficha($id, $idFicha,$modificar){
 	//$finicia = DateTime::createFromFormat('Y-m-d', $dficha['finicia']);
 	$html = '';
 	$ban = 0;
-		 $sqlt = "SELECT DISTINCT fr.nombre, fr.nivel, fc.numero, fc.lugar, pr.mes, pr.dia, pr.inicia, pr.finaliza, pr.fecha, pr.desCompetencia, pr.desResultado, pr.idResultado as idResultado, pr.idCompetencia as idCompetencia, u.nombre as instructor FROM formaciones fr INNER JOIN fcaracterizacion fc ON fr.id = fc.idprograma  INNER JOIN programacion pr ON fc.id = pr.idficha INNER JOIN usuarios u ON pr.idinstructor = u.id WHERE  fc.estado > 4 AND pr.estado = '1' AND pr.idficha = '$id' ORDER BY pr.mes, pr.dia, pr.inicia ;";
+		 $sqlt = "SELECT DISTINCT fr.nombre, fr.nivel, fc.numero, fc.lugar, pr.mes, pr.dia, pr.inicia, pr.finaliza, pr.fecha, pr.desCompetencia, pr.desResultado, pr.idResultado as idResultado, pr.idCompetencia as idCompetencia, u.nombre as instructor, pr.ID as idProgramacion, fc.formacion_Fuera FROM formaciones fr INNER JOIN fcaracterizacion fc ON fr.id = fc.idprograma  INNER JOIN programacion pr ON fc.id = pr.idficha INNER JOIN usuarios u ON pr.idinstructor = u.id WHERE  fc.estado > 4 AND pr.estado = '1' AND pr.idficha = '$id' ORDER BY pr.mes, pr.dia, pr.inicia ;";
 		 $stmt = Conexion::conectar()->prepare($sqlt);
 		 $stmt -> execute();
 		 if($stmt->rowCount() > 0){
@@ -254,17 +277,34 @@ public static function verHficha($id, $idFicha,$modificar){
 					  /********************/
 						$ban = 0;
 						$dato = ' Detalle <hr>';
+
+						$html.= '<td id="b'.$m.'_'.$day.'">';
+						$html.= $f->activo2($idFicha, $day, $m, $year, $ds, $festivo);
+
 						if(isset($registros)){
 							foreach ($registros as $key => $value){
+
+								$classColor = 'bg-dark';
+								if($value['formacion_Fuera'] == 1){
+									$classColor = 'bg-danger';
+								}
+
 								if($value['mes'] == $m && $value['dia'] == $day){
-									$dato .= $value['numero'].'<br>'.$value['inicia'].':00 -'.$value['finaliza'].':00 <br>'.$value['lugar'].'<br>';
+									$dato .= '<strong> FICHA: </strong> ' . $value['numero'].'<br>  <strong> Horario: </strong> '.$value['inicia'].':00 -'.$value['finaliza'].':00 <br> <strong> Ambiente: </strong> '.$value['lugar'].'<br>';
 									$dato .= 'Instructor: '.$value['instructor'].'<br>';
 									  
 								  if($value['nivel'] == '0' ){
 									  $dato .= $value['nombre'].'<hr>';
 								  }else{
-									  $dato .= $value['desCompetencia'].'<br>';
-									  $dato .= $value['desResultado'];
+									  
+									$dato .= '<button id="resf'.$value['mes'].'_'.$value['dia'].'_'.$value['inicia'].'_'.$value['finaliza'].'" ';
+									$dato .= 'onClick="verResultadosHorario('.$value['idProgramacion'].','.$modificar.')"';
+									$dato .= ' class="btn btn-primary text-white" ';
+									$dato .= ' type="button"> Consultar Resultados <i class="fas fa-list-ol"></i></button>';  
+									
+									//   $dato .= $value['desCompetencia'].'<br>';
+									//   $dato .= $value['desResultado'];
+
 									  
 									  if($modificar == 1){
 											$dato .= '<button id="d'.$value['mes'].'_'.$value['dia'].'_'.$value['inicia'].'_'.$value['finaliza'].'" ';
@@ -272,20 +312,28 @@ public static function verHficha($id, $idFicha,$modificar){
 											$dato .= ' class="btn btn-outline-default btn-sm text-white" ';
 											$dato .= ' type="button"> Quitar <i class="far fa-calendar-times "></i></button>'.'<hr>';            
 									  }
+									  
+									  $dato .='</hr>';
 								  } 
 								  
 								   
 								  $ban = 1;
+								  if($ban == 1){
+									$dato = substr($dato,0, strlen($dato) - 5);
+									$html .='<div class="card text-white '.$classColor.' mb-3 h6">'.$dato.'</div>';
+									}
+
+									$dato = "";
 								}
 							  }
 						}
 						//
-						$html.= '<td id="b'.$m.'_'.$day.'">';
-						$html.= $f->activo2($idFicha, $day, $m, $year, $ds, $festivo);
-						if($ban == 1){
-							$dato = substr($dato,0, strlen($dato) - 5);
-							$html .='<div class="card text-white bg-dark mb-3 h6">'.$dato.'</div>';
-						}
+						// $html.= '<td id="b'.$m.'_'.$day.'">';
+						// $html.= $f->activo2($idFicha, $day, $m, $year, $ds, $festivo);
+						// if($ban == 1){
+						// 	$dato = substr($dato,0, strlen($dato) - 5);
+						// 	$html .='<div class="card text-white bg-dark mb-3 h6">'.$dato.'</div>';
+						// }
 						
 						$html .='</td>';
 						/********************/ 
@@ -464,6 +512,67 @@ public static function lprogresultado(){
 				"competencia" => $competencia,
 				"resultado" => $resultado,
 				"seleccionar" =>$opciones	
+			);
+			array_push($salida, $newarray);
+				//$tabla .='{"codigo":"'.$codigo.'","competencia":"'.$competencia.'","resultado":"'.$resultado.'","seleccionar":"'.$opciones.'"},';
+		   }	
+		 }else{
+		 	    $newarray = array(
+					"codigo" => 'No hay datos',
+					"competencia" => 'No hay datos',
+					"resultado" => 'No hay datos',
+					"seleccionar" =>'No hay datos'	
+				);
+
+			array_push($salida, $newarray);
+		 }
+	}else{
+		 	    $newarray = array(
+					"codigo" => 'Sin conexion',
+					"competencia" => 'Sin conexion',
+					"resultado" => 'Sin conexion',
+					"seleccionar" =>'Sin conexion'	
+				);
+			array_push($salida, $newarray);
+	 }
+	$t = new TituladaModel();
+	$tabla = $t->safe_json_encode($salida);
+	$tabla = substr($tabla,0, strlen($tabla) - 1);
+	echo '{"data":'.$tabla.']}';
+} 
+
+/*********************************************/
+public static function lresultadoPro($idProgramacion, $modificar){
+	$tabla = '';
+	$opciones = '';
+	$a = new TituladaModel();
+	if(isset($_SESSION['prc_idusuario'])){ 
+	$centro = $_SESSION['prc_centro'];
+	$sqlt = "SELECT cp.id cpid, cp.codigo, cp.texto competencia, rs.id rsid, rs.texto resultado,pre.ID as idProRes FROM competencias cp INNER JOIN resultados rs ON cp.id = rs.idcompetencia INNER JOIN programacion_resultados pre ON rs.id = pre.idResultado WHERE cp.estado = '1' AND rs.estado = '1' AND cp.ccentro = '$centro' AND pre.idProgramacion = '$idProgramacion' ORDER BY cp.id ASC;";
+	$stmt = Conexion::conectar()->prepare($sqlt);
+	$stmt -> execute();
+	$total = $stmt->rowCount();
+	if($stmt->rowCount() > 0){
+	    $salida = array();		
+		$respuesta = '1';
+		$registros = $stmt->fetchAll();	
+		foreach ($registros as $key => $value) {
+            $rsid =  $value['rsid'];
+            $idProRes =  $value['idProRes'];
+            $cpid =  $value['cpid']; 
+            $codigo =  $value['codigo'];            
+            $lcompetencia = htmlentities($value['competencia']);
+            $competencia = substr(htmlentities($value['competencia']),0,40);
+            $competencia = strtolower($competencia);
+            $resultado = $value['resultado'];
+            $resultado = $resultado;
+			$resultado = strtolower($resultado);    
+			
+			
+			$newarray = array(
+				"codigo" => $codigo,
+				"competencia" => $competencia,
+				"resultado" => $resultado
 			);
 			array_push($salida, $newarray);
 				//$tabla .='{"codigo":"'.$codigo.'","competencia":"'.$competencia.'","resultado":"'.$resultado.'","seleccionar":"'.$opciones.'"},';
@@ -742,6 +851,12 @@ public static function listaFichasTitulada($tipores){
 
 
 public static function updateFicha($datos){ 
+
+	//nuevos datos
+	$directorGrupo = $datos['directorGrupo'];
+	$formacionFuera = $datos['formacionFuera'];
+
+
 	$ip = $_SERVER["REMOTE_ADDR"]; 
 	date_default_timezone_set('America/Bogota'); 
 	$fecha = date("Y-m-d");
@@ -788,9 +903,9 @@ public static function updateFicha($datos){
 		$usuario =	$_SESSION['prc_ciuser'];
 		$ccentro = $_SESSION['prc_centro'];
 		if($id == '0'){
-		$sqlt = "INSERT INTO fcaracterizacion (identificador, numero, lugar, ccentro, idprograma, coordinacion, departamento, ciudad, idusuario, finicia, ffinaliza,  usuario, estado) VALUES ('$identificador','$numero','$lugar','$ccentro','$programa','$coordinacion','$depto','$ciudad','$idusuario', '$fechainicio', '$fechafin', '$usuario', '1')";
+		$sqlt = "INSERT INTO fcaracterizacion (identificador, numero, lugar, ccentro, idprograma, coordinacion, departamento, ciudad, idusuario, finicia, ffinaliza,  usuario, estado, director_grupo, formacion_Fuera) VALUES ('$identificador','$numero','$lugar','$ccentro','$programa','$coordinacion','$depto','$ciudad','$idusuario', '$fechainicio', '$fechafin', '$usuario', '1', '$directorGrupo', '$formacionFuera')";
 		}else{
-		$sqlt = "UPDATE fcaracterizacion SET lugar = '$lugar', idprograma = '$programa', coordinacion = '$coordinacion', departamento = '$depto', ciudad = '$ciudad', idusuario = '$idusuario', finicia = '$fechainicio', ffinaliza = '$fechafin', usuario = '$usuario' WHERE id = '$id'"; 		
+		$sqlt = "UPDATE fcaracterizacion SET lugar = '$lugar', idprograma = '$programa', coordinacion = '$coordinacion', departamento = '$depto', ciudad = '$ciudad', idusuario = '$idusuario', finicia = '$fechainicio', ffinaliza = '$fechafin', usuario = '$usuario', formacion_Fuera = '$formacionFuera', director_grupo = '$directorGrupo' WHERE id = '$id'"; 		
 		}
 			$stmt = Conexion::conectar()->prepare($sqlt);
 			$stmt -> execute();
@@ -974,7 +1089,7 @@ public static function updateCompetencia($datos){
    $f = new TituladaModel();
 	if(isset($_SESSION['prc_idusuario'])){ 
 	   $centro = $_SESSION['prc_centro'];   
-	   $sqlt = "SELECT fc.id, fc.numero,   fc.coordinacion, fc.idprograma, fc.finicia, fc.ffinaliza, fc.lugar, fr.nivel, fc.departamento, fc.ciudad, fc.jornada FROM fcaracterizacion fc INNER JOIN formaciones fr ON fc.idprograma = fr.id WHERE fc.id = '$id' AND fc.ccentro = '$centro';";
+	   $sqlt = "SELECT fc.id, fc.numero,   fc.coordinacion, fc.idprograma, fc.finicia, fc.ffinaliza, fc.lugar, fr.nivel, fc.departamento, fc.ciudad, fc.jornada, fc.formacion_Fuera, fc.director_grupo FROM fcaracterizacion fc INNER JOIN formaciones fr ON fc.idprograma = fr.id WHERE fc.id = '$id' AND fc.ccentro = '$centro';";
 			$stmt = Conexion::conectar()->prepare($sqlt);
 			$stmt -> execute();
 			if($stmt->rowCount() > 0){
@@ -991,6 +1106,8 @@ public static function updateCompetencia($datos){
 					$departamento = $value['departamento'];
 					$ciudad = $value['ciudad'];
 					$lugar = $value['lugar'];
+					$director_grupo = $value['director_grupo'];
+					$formacion_Fuera = $value['formacion_Fuera'];
 					if($value['nivel'] == '0'){
 						$respuesta = '2';
 					}
@@ -1005,7 +1122,9 @@ public static function updateCompetencia($datos){
 							'ffinaliza' => $ffinaliza, 
 							'departamento' => $departamento, 
 							'ciudad' => $ciudad, 
-							'lugar' => $lugar
+							'lugar' => $lugar,
+							'director_grupo' => $director_grupo,
+							'formacion_Fuera' => $formacion_Fuera
 				        );
 				}
 		    }else{

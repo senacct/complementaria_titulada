@@ -1,3 +1,15 @@
+//String que almacena el html a mostrar
+var listaResultadoSel = [];
+// string que almacena los ids concatenados para enviar al servidor, ver motodo selResultado()
+var listaIDSResultadoSel = [];
+var listaIDSCompeteSel = [];
+// string que almacena los textos concatenados para enviar al servidor, ver motodo selResultado()
+var listaTEXTOResultadoSel = [];
+var listaTEXTOCompeteSel = [];
+
+var listaDiasSel=[];
+
+
 function programarFichas(idficha, idtrimestre){
   $('#btncal'+idficha).attr('disabled', 'disabled');
   var html = ''; 
@@ -42,14 +54,14 @@ function programarFichas(idficha, idtrimestre){
 
           html +='<div class="bs-callout bs-callout-info"><label style="display:none;" id="lIdficha"></label><p id="lficha"></p></div>';
           html +='<div class="bs-callout bs-callout-danger"><label style="display:none;" id="lIdInstructor"></label><label style="display:none;" id="lTVInstructor"></label><p id="linstructor"></p></div>';          
-          html +='<div class="bs-callout bs-callout-warning"><label style="display:none;" id="lIdResultado"></label><p id="lresultado"></p></div>';
+          html +='<div class="bs-callout bs-callout-warning"><label style="display:none;" id="lIdResultado"></label><p id="divResultado"></p></div>'; 
           html +='<div style="display:none;"><label style="display:none;" id="lIdCompetencia"></label><label style="display:none;" id="lTextResultado"></label><label style="display:none;" id="lTextCompetencia"></label></div>';
 
           html +='<div class="form-group mb-2"> ';  
           html +='<hr><h5 class="card-title">Franja</h5><hr>'; 
 
           html +='<div class="row">';
-          html +='<div class="col col-12 col-md-4">';
+          html +='<div class="col col-12 col-md-6">';
 
           html +='<label for="inicia" class="col-form-label"><span class="h5">Inicia</span></label> ';
           html +='<select id="inicia" class="form-control form-control-sm"> ';
@@ -60,17 +72,36 @@ function programarFichas(idficha, idtrimestre){
           html +='</div>';
  
 
-          html +='<div class="col col-12 col-md-4">';
+          html +='<div class="col col-12 col-md-6">';
 
           html +='<label for="finaliza" class="col-form-label"><span class="h5">Finaliza</span></label>';
           html +='<select id="finaliza" class="form-control form-control-sm">';
           html +='</select>';
           html +='</div>';
-          html +='</div>';
+
+          html +='<div class="col col-12 text-center">';
+
+          html +='<label for="finaliza" class="col-form-label col-sm-12"><span class="h5">Selecione los dias de la formación</span></label>';
+          html +='<button id="btDia1" type="button" onClick="selDiaFormacion(1);" class="btn btn-secondary margin-btn">Lunes</button>' ;  
+          html +='<button id="btDia2" type="button" onClick="selDiaFormacion(2);" class="btn btn-secondary margin-btn">Martes</button>' ;  
+          html +='<button id="btDia3" type="button" onClick="selDiaFormacion(3);" class="btn btn-secondary margin-btn">Miercoles</button>' ;  
+          html +='<button id="btDia4" type="button" onClick="selDiaFormacion(4);" class="btn btn-secondary margin-btn">Jueves</button>' ;  
+          html +='<button id="btDia5" type="button" onClick="selDiaFormacion(5);" class="btn btn-secondary margin-btn">Viernes</button>' ;  
+          html +='<button id="btDia6" type="button" onClick="selDiaFormacion(6);" class="btn btn-secondary margin-btn">Sabado</button>' ;  
+          html +='<button id="btDia0" type="button" onClick="selDiaFormacion(0);" class="btn btn-secondary margin-btn">Domingo</button>' ;  
           html +='</div>';
 
+          html +='<div class="bs-callout bs-callout-warning text-center">';
+          html +='<button type="button" onClick="verHorarios();" class="btn btn-sm btn-outline-success margin-btn">Consultar Calendario</button>';
+          html +='<button id="btEnviar" type="button" onClick="crearProgramacionMultiple();" class="btn btn-sm btn-outline-success margin-btn">Crear Programacion</button>' ;  
+          html +='</div>';
+
+
+          html +='</div>';
+          html +='</div>';
+          
+
           html +='</form>'; 
-          html +='<button type="button" onClick="resetDias('+idficha+','+idtrimestre+');" class="btn btn-secondary">Desmarcar calendario</button>' ;  
           html +='<script>'; 
           html +=' $(document).ready(function() {';
           html +='   $("#inicia").change(function(){';
@@ -85,6 +116,109 @@ function programarFichas(idficha, idtrimestre){
      //programacion(idficha, idtrimestre);                             
 }
 
+function selDiaFormacion(diaSel){
+
+  var btDia = $("#btDia"+diaSel);
+
+  var estaAgregando = btDia.hasClass("btn-secondary");
+
+  var classRemove = estaAgregando ? "btn-secondary":"btn-primary";
+  var classAdd = estaAgregando ? "btn-primary":"btn-secondary";
+
+  if(estaAgregando){
+    listaDiasSel.push(diaSel);
+  }else{
+    var index = listaDiasSel.indexOf(diaSel);
+    listaDiasSel.splice(index, 1);
+    //listaDiasSel.
+  }
+
+  btDia.removeClass(classRemove);
+  btDia.addClass(classAdd);
+
+  // alert("dias: " + listaDiasSel.toString());
+
+}
+
+function crearProgramacionMultiple(){
+
+  
+  //cargamos los valores del instructor y el resultado
+  var idInstructor = $("#lIdInstructor").text();
+  var esTitulada = 1;
+  var esMultiple = 1;
+
+  var idResultado = JSON.stringify(listaIDSResultadoSel);
+  var idCompetencia = JSON.stringify(listaIDSCompeteSel);
+  var diasSemana = JSON.stringify(listaDiasSel);
+
+  
+  var inicia = $("#inicia").val();
+  var finaliza = $("#finaliza").val();
+  var parametros = {
+      dato:'calendario',
+      request:'sel',
+      idficha:$("#lIdficha").text(),
+      inicia:inicia,
+      finaliza:finaliza,
+      ano:0,
+      mes:0,
+      dia: 0,
+      ds:diasSemana,
+      festivo:0,
+      //se agregan dos parametros
+      idResultado: idResultado,
+      idInstructor:idInstructor,
+      idCompetencia:idCompetencia,
+      textCompetencia:'',
+      textResultado:'',
+      esTitulada:esTitulada,
+      esMultiple:esMultiple
+     }
+      $.ajax({
+      url: '../views/com/formacioncom.php',
+      type:'POST',
+      dataType:'html', //tipo de data que retornaf
+      data:parametros,
+      timeout: 600000 // sets timeout to 10 minutos
+      }).done(function(data){ //donde se ejecuta al terminar la ejecucion del archivo php  
+       var datosRecibidos = JSON.parse(data);  
+        $('#btnnficha').attr('disabled', false);                  
+        $.each(datosRecibidos, function(key,value){ 
+        html = '';    
+        switch(value.respuesta){   
+            case '0':
+               aCommand: toastr["info"]("No hay cambios registrados"); 
+               break;                  
+            case '1':
+                // var boton = '';
+                // boton +='<button id="d'+mes+'_'+dia+'" ';
+                // boton +='onClick="unselCalendario('+idficha+','+ano+','+mes+','+dia+','+ds+','+inicia+','+finaliza+','+festivo+')"';
+                // boton +=' class="btn btn-outline-default btn-sm" ';
+                // boton +=' type="button">'+dia+' <i class="far fa-calendar-times"></i></button>';            
+                // $('#b'+mes+'_'+dia).html(boton); 
+                // // programacion(idficha, idtrimestre);     
+                // //programacion(idficha, 0);   
+
+                swal("Resultado...", value.label, "info");    
+
+                verHorarios();
+               break;     
+            case '2':
+              swal("Resultado...", value.label, "info");    
+
+              verHorarios();  
+               break;                                        
+            case '5':
+               //frmlogin();
+               break;
+           }   
+        }); 
+
+    }); 
+  
+
+}
 
 
 function traerlfichas(){
@@ -387,6 +521,101 @@ columns: [
   }); 
 } 
 
+var bodyhtmlModal;
+
+
+
+function traerinstructoresFichas(id, idDepto, idCiudad){
+  var html = '';  
+     html +=' <div class="col-sm-12">';
+     html +='   <label id="idFichaActual">'+id+'</label>';
+     html +='   <label id="idDeptoActual">'+idDepto+'</label>';
+     html +='   <label id="idCiudadActual">'+idCiudad+'</label>';
+     html +=' </div>';
+     html +=' <div class="table-responsive">';
+     html +='  <table id="tituladas1" class="table table-sm table-bordered table-striped">';
+     html +='     <thead>';
+     html +='         <tr>';
+     html +='         <th>COORDINACION</th>';        
+     html +='         <th>INSTRUCTOR</th>';   
+     html +='         <th>VINCULACIÓN</th>'; 
+     html +='         <th>SELECCIONAR</th>';                    
+     html +='         </tr>';
+     html +='     </thead>';
+     html +='     <tbody>';
+     html +='     </tbody>';
+     html +='    </table>';
+     html +='   </div>';
+
+
+     //$('#myModal').modal('hide');
+
+
+     //InstructorModal();  
+     $('#myModalLabel').html('INSTRUCTORES');
+
+     bodyhtmlModal = $('#bodymodalIn').html();
+     $('#bodymodal').html(html);
+     $('#myModal').modal('show'); 
+    var table = $('#tituladas1').DataTable( {
+     responsive: true,
+     autoWidth: false,
+         columnDefs: [
+             { responsivePriority: 1, targets: 0 },
+             { responsivePriority: 2, targets: -1 } 
+         ],
+     bDeferRender: true,     
+     sPaginationType: "full_numbers",
+     ajax: {
+       url:"../views/com/usuariocom.php",
+       type: "POST",
+       data:{'dato':'usuario', 'request':'selprogramarFicha'},   
+     },    
+ columns: [
+     { "data": "coordinacion"},
+     { "data": "instructor"},    
+     { "data": "vinculacion"},
+     { "data": "seleccionar"}     
+   ],
+ "autoWidth": false,
+     "responsive" : true,
+   
+ "oLanguage": {
+     "sProcessing": "Procesando...",
+     "sLengthMenu": 'Mostrar <select>'+
+         '<option value="10">10</option>'+
+         '<option value="20">20</option>'+
+         '<option value="30">30</option>'+
+         '<option value="40">40</option>'+
+         '<option value="50">50</option>'+
+         '<option value="-1">All</option>'+
+         '</select> registros',    
+             "sZeroRecords":    "No se encontraron resultados",
+             "sEmptyTable":     "Ningún dato disponible en esta tabla",
+             "sInfo":           "Mostrando del (_START_ al _END_) de un total de _TOTAL_ registros",
+             "sInfoEmpty":      "Mostrando del 0 al 0 de un total de 0 registros",
+             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+             "sInfoPostFix":    "",
+             "sSearch":         "Filtrar:",
+             "sUrl":            "",
+             "sInfoThousands":  ",",
+             "sLoadingRecords": "Por favor espere - cargando...",
+             "oPaginate": {
+                 "sFirst":    "Primero",
+                 "sLast":     "Último",
+                 "sNext":     "Siguiente",
+                 "sPrevious": "Anterior"
+             },
+         "oAria": {
+         "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+         "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+       } 
+     },
+   }); 
+ } 
+ 
+
+
 function selFichaTitulada(id, numero, nombre){
   $('#lIdficha').text("");
   //var boton = '<button type="button" onClick="verHficha('+id+');" class="btn btn-sm btn-outline-success">Ver horario de la ficha</button>';
@@ -408,6 +637,34 @@ function selInstruProgramar(id, nombre, crnombre, tipoVinculacion){
   $('#lTVInstructor').text(tipoVinculacion);
 
   
+}
+
+function selInstruProgramarFicha(id, nombre, crnombre, tipoVinculacion){
+  $('#directorGrupo').val("");
+  $('#lbDirectorGrupoID').text("");
+
+  //var boton = '<button type="button" onClick="verHinstructor('+id+');" class="btn btn-sm btn-outline-success">Ver horario del instructor</button>';
+  //bodyhtmlModal
+
+  $('#myModal').modal('hide');
+  $('body').removeClass('modal-open');
+  $('.modal-backdrop').remove();
+
+  // $('#myModal').modal('hide');
+  // $('#myModal').modal('toggle');
+
+  var idFicha = $('#idFichaActual').text();
+  var idDep = $('#idDeptoActual').text();
+  var idCiudad =$('#idCiudadActual').text();
+
+  // alert($('#idFichaActual').text());
+
+  nuevaFichaTitulada(idFicha,idDep,idCiudad,1);
+
+  $("#directorGrupo").val(nombre);
+  $('#lbDirectorGrupoID').text(id);
+
+  // alert(crnombre);
 }
 
 function verHinstructor(idinstructor){
@@ -472,10 +729,10 @@ function verHorarios(){
 // No deja consultar si los 3 parametros no estan activos
 function validarParametrosBusqueda(){
   var idFicha = $("#lIdficha").text();
-  var idResult = $("#lIdResultado").text();
+  var idResult = listaIDSResultadoSel.length;
   var idInstr = $("#lIdInstructor").text();
   
-  if(idFicha != "" && idResult != "" && idInstr != ""){
+  if(idFicha != "" && idResult > 0 && idInstr != ""){
     return true;
   }
 
@@ -485,18 +742,55 @@ function validarParametrosBusqueda(){
 
 function selResultado(id, competencia, resultado, idCompetencia){
 
-  var boton = '<button type="button" onClick="verHorarios();" class="btn btn-sm btn-outline-success">Consultar Calendario</button>';
+  var posLista = listaResultadoSel.length;
 
-    $('#lIdResultado').text(id);
-    $('#lIdCompetencia').text(idCompetencia);
-    $('#lTextCompetencia').text(competencia);
-    $('#lTextResultado').text(resultado);
+  //var boton = '<button type="button" onClick="verHorarios();" class="btn btn-sm btn-outline-success">Consultar Calendario</button>';
+  var botonQuitar = '<button type="button" onClick="removerResultadoSel('+posLista+');" class="btn btn-sm btn-outline-warning">X</button>';
+
+    // $('#lIdResultado').text(id);
+    // $('#lIdCompetencia').text(idCompetencia);
+    // $('#lTextCompetencia').text(competencia);
+    // $('#lTextResultado').text(resultado);
     
     $('#myModal').modal('hide');
-    var nombre = '['+competencia+']<br><br>'+resultado + '<br><br>' +boton;
-    $('#lresultado').html(nombre);
-    $("#lresultado").prop("name",id);
-    $('#lIdResultado').text(id);
+    //var nombre = 'Competencia: ['+competencia+']<br><br> Resultado: '+resultado + '<br><br>' +boton;
+    var nombre = '<strong>Competencia:</strong>'+competencia+' <br><br> <strong>Resultado:</strong> '+resultado + '  ' +botonQuitar + ' <br>';
+    //$('#divResultado').html(nombre);
+    //$("#divResultado").prop("name",id);
+    //$('#lIdResultado').text(id);
+
+    listaResultadoSel.push(nombre);
+
+    listaIDSResultadoSel.push(id);
+    listaIDSCompeteSel.push(idCompetencia);
+    
+    listaTEXTOResultadoSel.push(resultado);
+    listaTEXTOCompeteSel.push(competencia);
+
+    recargarListaResultados();
+}
+
+function removerResultadoSel(posLista){
+
+  listaResultadoSel.splice(posLista, 1);
+  listaIDSResultadoSel.splice(posLista, 1);
+  listaIDSCompeteSel.splice(posLista, 1);
+  listaTEXTOResultadoSel.splice(posLista, 1);
+  listaTEXTOCompeteSel.splice(posLista, 1);
+  
+  recargarListaResultados();
+}
+
+function recargarListaResultados(){
+
+  var textoHtml = "" ;
+  
+  for(var i = 0; i< listaResultadoSel.length; i++){
+      textoHtml +=listaResultadoSel[i];
+  }
+
+  $('#divResultado').html(textoHtml);
+
 }
 
 function listarFichasTitulada(){
@@ -784,13 +1078,20 @@ function resetDias(idficha, idempresa){
 
 function selCalendario(idficha, ano, mes, dia, ds, festivo){
 
+ 
   //cargamos los valores del instructor y el resultado
-  var idResultado = $("#lIdResultado").text();
   var idInstructor = $("#lIdInstructor").text();
-  var idCompetencia = $("#lIdCompetencia").text();
-  var textCompetencia = $("#lTextCompetencia").text();
-  var textResultado = $("#lTextResultado").text();
   var esTitulada = 1;
+  var esMultiple = 0;
+
+  var idResultado = JSON.stringify(listaIDSResultadoSel);
+  var idCompetencia = JSON.stringify(listaIDSCompeteSel);
+
+  var textoCompentencia = "";
+  var textoResultado = "";
+
+  var textCompetencia = textoCompentencia;
+  var textResultado = textoResultado;
 
   $('#b'+mes+'_'+dia).attr('disabled', 'disabled');
   $('#'+mes+'_'+dia).removeClass('btn-outline-warning');
@@ -814,7 +1115,8 @@ function selCalendario(idficha, ano, mes, dia, ds, festivo){
       idCompetencia:idCompetencia,
       textCompetencia:textCompetencia,
       textResultado:textResultado,
-      esTitulada:esTitulada
+      esTitulada:esTitulada,
+      esMultiple:esMultiple
      }
       $.ajax({
       url: '../views/com/formacioncom.php',
@@ -833,7 +1135,7 @@ function selCalendario(idficha, ano, mes, dia, ds, festivo){
             case '1':
                 var boton = '';
                 boton +='<button id="d'+mes+'_'+dia+'" ';
-                boton +='onClick="unselCalendario('+idficha+','+ano+','+mes+','+dia+','+ds+','+inicia+','+finaliza+','+festivo+')"';
+                boton +='onClick="unselCalendario('+idficha+','+ano+','+mes+','+dia+','+ds+','+inicia+','+finaliza+','+festivo +','+esTitulada+')"';
                 boton +=' class="btn btn-outline-default btn-sm" ';
                 boton +=' type="button">'+dia+' <i class="far fa-calendar-times"></i></button>';            
                 $('#b'+mes+'_'+dia).html(boton); 
@@ -914,6 +1216,83 @@ function unselProgramacion(idficha, ano, mes, dia, ds, inicia, finaliza, festivo
 
     }); 
   
+}
+
+function verResultadosHorario(idProgramacion, puedeModificar){
+
+    var html = '';  
+       html +=' <div class="table-responsive">';
+       html +='  <table id="resultadosSel" class="table table-sm table-bordered table-striped">';
+       html +='     <thead>';
+       html +='         <tr>';
+       html +='         <th>CODIGO</th>';        
+       html +='         <th>COMPETENCIA</th>';   
+       html +='         <th>RESULTADO</th>'; 
+       html +='         </tr>';
+       html +='     </thead>';
+       html +='     <tbody>';
+       html +='     </tbody>';
+       html +='    </table>';
+       html +='   </div>';
+       vervtnmodal();  
+       $('#myModalLabel').html('RESULTADOS');
+       $('#bodymodal').html(html);
+       $('#myModal').modal('show'); 
+      var table = $('#resultadosSel').DataTable( {
+       responsive: true,
+       autoWidth: false,
+           columnDefs: [
+               { responsivePriority: 1, targets: 0 },
+               { responsivePriority: 2, targets: -1 } 
+           ],
+       bDeferRender: true,     
+       sPaginationType: "full_numbers",
+       ajax: {
+         url: "../views/com/tituladacom.php",
+         type: "POST",
+         data:{'dato':'titulada', 'request':'lresultadoPro', 'idProgramacion':idProgramacion ,'modificar':puedeModificar},  
+       },    
+   columns: [
+       { "data": "codigo"},
+       { "data": "competencia"},    
+       { "data": "resultado"},
+     ],
+   "autoWidth": false,
+       "responsive" : true,
+     
+   "oLanguage": {
+       "sProcessing": "Procesando...",
+       "sLengthMenu": 'Mostrar <select>'+
+           '<option value="10">10</option>'+
+           '<option value="20">20</option>'+
+           '<option value="30">30</option>'+
+           '<option value="40">40</option>'+
+           '<option value="50">50</option>'+
+           '<option value="-1">All</option>'+
+           '</select> registros',    
+               "sZeroRecords":    "No se encontraron resultados",
+               "sEmptyTable":     "Ningún dato disponible en esta tabla",
+               "sInfo":           "Mostrando del (_START_ al _END_) de un total de _TOTAL_ registros",
+               "sInfoEmpty":      "Mostrando del 0 al 0 de un total de 0 registros",
+               "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+               "sInfoPostFix":    "",
+               "sSearch":         "Filtrar:",
+               "sUrl":            "",
+               "sInfoThousands":  ",",
+               "sLoadingRecords": "Por favor espere - cargando...",
+               "oPaginate": {
+                   "sFirst":    "Primero",
+                   "sLast":     "Último",
+                   "sNext":     "Siguiente",
+                   "sPrevious": "Anterior"
+               },
+           "oAria": {
+           "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+           "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+         } 
+       },
+     }); 
+
 }
 
 function solpublicarficha(idFicha, idempresa){
@@ -999,7 +1378,8 @@ function verValidacion(idFicha, idempresa){
     }); 
 }
 
-function unselCalendario(idficha, ano, mes, dia, ds, inicia, finaliza, festivo, idResultado, idCompetencia,textResultado,textCompetencia){
+function unselCalendario(idficha, ano, mes, dia, ds, inicia, finaliza, festivo, idResultado, idCompetencia,textResultado,textCompetencia, esTitulada = 0){
+
 
   //cargamos los valores del instructor y el resultado
   //var idResultado = $("#lIdResultado").text();
@@ -1036,7 +1416,8 @@ function unselCalendario(idficha, ano, mes, dia, ds, inicia, finaliza, festivo, 
         idInstructor:idInstructor,
         idCompetencia:idCompetencia,
         textCompetencia:textCompetencia,
-        textResultado:textResultado
+        textResultado:textResultado,
+        esTitulada:esTitulada
        }
       $.ajax({
       url: '../views/com/formacioncom.php',
@@ -1109,6 +1490,11 @@ function validarfecha(fecha, frm){
 
 function crearficha(idficha){
 try{
+  //Nuevos datos
+  var formacionFuera = '0';
+  var directorGrupo = '';
+
+
   var ciudad = '0';
   var depto = '0';
   var jornada = '0';
@@ -1145,6 +1531,15 @@ try{
             coordinacion = $(this).val();
           });
       }).trigger('change');  
+
+      $("#formacionFuera").change(function () {
+        $("#formacionFuera option:selected").each(function(){
+          formacionFuera = $(this).val();
+        });
+    }).trigger('change');  
+
+      directorGrupo = $('#directorGrupo').val();
+
       fechainicio = $('#fechainicio').val();
       fechafin = $('#fechafin').val();
       ficha = $('#ficha').val();
@@ -1177,7 +1572,10 @@ try{
       'ambiente':ambiente,
       'jornada':jornada,
       'fechainicio':fechainicio,
-      'fechafin':fechafin
+      'fechafin':fechafin,
+      //nuevos parametros
+      'directorGrupo':directorGrupo,
+      'formacionFuera':formacionFuera
       };  
      if(error == '0'){ 
       $.ajax({
@@ -1379,7 +1777,7 @@ function listarFichasTitulada1(){
 
 
 
-function nuevaFichaTitulada(id, idDepto, idCiudad){
+function nuevaFichaTitulada(id, idDepto, idCiudad, selInstructor = 0){
 var html = '<div class="card">'; 
     html +='<div class="card-header">';
     html +='   <h5 class="card-title"> FICHAS FORMACIÓN TITULADA: </h5>';
@@ -1445,6 +1843,29 @@ var html = '<div class="card">';
     html +='              <input placeholder="YYYY-MM-DD" type="text" id="fechafin" onkeypress="return soloFechas(event,\'fechafin\');" onpaste="return false" class="form-control" maxlength="10">'; 
     html +='            </div>';
     html +='          </div>'; 
+
+    //nuevos datos
+    html +='          <div class="row">';
+    html +='            <div class="col col-12 col-md-6 ">';
+    html +='              <label class="col-sm-12 col-form-label">Director de grupo</label>';
+    html +='              <label id="lbDirectorGrupoID" style="display:none;" class="col-sm-12 col-form-label"></label>';
+    html +='              <div class=" form-inline ">';
+    html +='                <input type="text" class="form-control col-sm-10" id="directorGrupo" disabled>';
+    html +='                <div class="input-group-append">';
+    html +='                  <button class="btn btn-outline-secondary" onClick="traerinstructoresFichas('+id +', ' + idDepto +',' + idCiudad+ ');" type="button" id="btnDirectorGrupo"><i class="fas fa-chalkboard-teacher"></i></button>';
+    html +='                </div>';
+    html +='              </div>';
+    html +='            </div>';
+    html +='            <div class="col-12 col-md-6">';
+    html +='            <label  class="col-sm-12 col-form-label">¿Formacion Fuera del centro?</label>';
+    html +='              <select id="formacionFuera" class="custom-select">';
+    html +='                  <option value="0">No</option>';
+    html +='                  <option value="1">Si</option>';
+    html +='              </select>';
+    html +='            </div>';
+    html +='          </div>'; 
+
+
     html +='          <div class="row">';  
     html +='            <div class="col col-12 col-md-8">';
     html +='              <label id="frmcoordinacion" for="coordinacion" class="col-sm-12 col-form-label">Coordinación<span id="sofia" style="color:green" ></span></label>';
@@ -1481,7 +1902,7 @@ var html = '<div class="card">';
     $("#btnact").html(boton);
     $('#myModal').modal('show'); 
     if(id !== '0'){
-    traerEditficha(id)
+    traerEditficha(id, selInstructor)
      }
 }
 
@@ -1615,7 +2036,7 @@ try{
 }
 
 
-function traerEditficha(id){
+function traerEditficha(id, selInstructor = 0){
   var parametros = {
     'dato':'titulada',
     'request':'teditar',   
@@ -1647,6 +2068,11 @@ try{
                     $("#depto > option[value="+value.departamento+"]").attr("selected", "selected");
                     $("#ciudad > option[value="+value.ciudad+"]").attr("selected", "selected");
                     $("#coordinacion > option[value="+value.coordinacion+"]").attr("selected", "selected");
+                    $("#formacionFuera > option[value="+value.formacion_Fuera+"]").attr("selected", "selected");
+                    if(selInstructor == 0){
+                      $("#directorGrupo").val(value.director_grupo);
+                    }
+
                     var boton = '<div id="btncrearprograma"><button id="btnnficha" type="button" onClick="crearficha(\''+id+'\');" class="btn btn-primary">Actualizar</button></div>';
                     $("#btnact").html(boton);
                  break;
@@ -2043,6 +2469,31 @@ html +='  </div>';
 html +='</div>';
 $('#placemodal').html(html);          
 }
+
+function InstructorModal(){
+  var html = '';
+  html +='<div class="modal fade bd-example-modal-xl" id="myModalIn" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">';
+  html +='  <div class="modal-dialog modal-xl" role="document">';
+  html +='    <div class="modal-content">';
+  html +='      <div class="modal-header">';
+  html +='        <h5 class="modal-title" id="myModalInLabel">Seleccionar Instructor</h5>';
+  html +='        <button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+  html +='          <span aria-hidden="true">&times;</span>';
+  html +='        </button>';
+  html +='      </div>';
+  
+  html +='      <div id="bodymodalIn" class="modal-body">';
+  html +='      </div>';
+  html +='      <div class="modal-footer">';
+  html +='      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>';
+  html +='      <span id="btnact"></span> ';
+  html +='      </div>';
+  html +='    </div>';
+  html +='  </div>';
+  html +='</div>';
+  $('#placemodal').html(html);          
+  }
+  
 
 function validaremail(email) {
     expr = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;

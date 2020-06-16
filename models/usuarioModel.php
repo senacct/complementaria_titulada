@@ -703,7 +703,61 @@ public static function listadoUsuariosSel(){
  return '{"data":['.$tabla.']}';     
 }
 
- 
+
+public static function listadoUsuariosSelFicha(){
+  $tabla = '';
+  $opciones = '';
+  if(isset($_SESSION['prc_idusuario'])){ 
+  $centro = $_SESSION['prc_centro'];
+  $sqlt = "SELECT us.id id, us.nombre, us.vinculacion, us.instructor, uc.estado, us.idcoordinacion, cr.nombre crnombre FROM usuarios us INNER JOIN coordinaciones cr ON us.idcoordinacion = cr.id INNER JOIN usuariocentro uc ON uc.idusuario = us.id WHERE uc.centro = '$centro' AND us.instructor = '1' ORDER BY us.nombre ASC";
+  $stmt = Conexion::conectar()->prepare($sqlt);
+  $stmt -> execute();
+  if($stmt->rowCount() > 0){
+    $respuesta = '1';
+    $registros = $stmt->fetchAll(); 
+    foreach ($registros as $key => $value) {
+      $id = $value['id'];
+      $nombre = html_entity_decode(strtolower($value['nombre']));
+      $nombre = ucwords($nombre);
+      $crnombre = html_entity_decode(strtolower($value['crnombre']));
+      $crnombre = ucwords($crnombre);      
+      $vinculacion = $value['vinculacion'];  
+      $idcoordinacion = $value['idcoordinacion'];
+      $estado = $value['estado'];
+      if($estado == '1'){
+        $sestado = 'btn-success';
+        $testado = '<span style=\"color:green;\">Activo</span>';
+        $iestado = '<i class=\"fas fa-lock-open\"></i>';
+      }else{
+        $sestado = 'btn-danger';
+        $testado = '<span style=\"color:orange;\">Inactivo</span>';
+        $iestado = '<i class=\"fas fa-lock\"></i>';
+      }
+
+      if($vinculacion == '1'){
+        $lvinculacion = 'Planta';
+      }else{
+        $lvinculacion = 'Contratista';
+      }
+      if($estado == '1'){
+        $sestado = 'btn-success';
+        $testado = '<span style=\"color:green;\">Activo</span>';
+        $iestado = '<i class=\"fas fa-lock-open\"></i>';
+      }else{
+        $sestado = 'btn-danger';
+        $testado = '<span style=\"color:orange;\">Inactivo</span>';
+        $iestado = '<i class=\"fas fa-lock\"></i>';
+      }
+      $seleccionar ='<button type=\"button\" id=\"btnperfiles'.$id.'\" onClick=\"selInstruProgramarFicha(\''.$id.'\',\''.$nombre.'\',\''.$crnombre.'\',\''.$lvinculacion.'\');\"  class=\"btn btn-info btn-sm\"><i class=\"fas fa-check\"></i></button>';
+
+      $tabla .= '{"instructor":"'.$nombre.'","coordinacion":"'.$crnombre.'" , "vinculacion":"'.$lvinculacion.'","seleccionar":"'.$seleccionar.'"},';
+    } 
+   } 
+  $tabla = substr($tabla,0, strlen($tabla) - 1);
+  } 
+ return '{"data":['.$tabla.']}';     
+} 
+
 
 public static function getPerfiles($parametros){ 
 $idusuario = $parametros['idusuario'];

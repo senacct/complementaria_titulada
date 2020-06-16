@@ -30,6 +30,10 @@ Class Titulada{
 	    $respuesta = TituladaController::lprogresultado();
  		return $respuesta;
 	}	
+	public function lresultadoPro($idProgramacion, $modificar){
+	    $respuesta = TituladaController::lresultadoPro($idProgramacion, $modificar);
+ 		return $respuesta;
+	}
 	public function traerlprogramas(){
 	    $respuesta = TituladaController::traerlprogramas();
  		return $respuesta;
@@ -123,6 +127,12 @@ switch ($dato) {
 			$error = $a->validarfecha($fechainicio);
 			$ferror = 'frmfinicio';
 			$verror = $fechainicio;
+
+//nuevos datos
+			$directorGrupo = filter_input(INPUT_POST,'directorGrupo');
+			$formacionFuera = filter_input(INPUT_POST,'formacionFuera');
+			
+
 			if($error == 0){
 			   $error = $a->validarfecha($fechafin);
 			   if($error == '1'){
@@ -140,7 +150,10 @@ switch ($dato) {
 					'lugar' => htmlentities($lugar),
 					'programa' => $programa,
 					'fechainicio' => $fechainicio,
-					'fechafin' => $fechafin
+					'fechafin' => $fechafin,
+					
+					'directorGrupo' => $directorGrupo,
+					'formacionFuera' => $formacionFuera
 	            ];
 	        if($error == 0){
 				echo $a->updateFicha($arregloDatos); 
@@ -172,7 +185,15 @@ switch ($dato) {
 			break;		
 			case 'lprogresultado':			
 			echo $a->lprogresultado(); 
-			break;						
+			break;	
+			case 'lresultadoPro':
+				
+				$idProgramacion = filter_input(INPUT_POST,'idProgramacion');
+				$modificar= filter_input(INPUT_POST,'modificar');
+
+				echo $a->lresultadoPro($idProgramacion,$modificar); 
+				
+			break;					
 			case 'valfecha':
 			$fecha = filter_input(INPUT_POST,'fecha');
 			echo $a->validarFecha($fecha); 

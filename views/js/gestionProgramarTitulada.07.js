@@ -79,7 +79,14 @@ function programarFichas(idficha, idtrimestre){
           html +='</select>';
           html +='</div>';
 
-          html +='<div class="col col-12 text-center">';
+
+          html +='<div class="bs-callout bs-callout-warning text-center">';
+          html +='<button type="button" onClick="verHorarios();" class="btn btn-sm btn-outline-success margin-btn">Consultar Calendario</button>';
+          html +='<button id="btMult" type="button" onClick="mostrarOcultarMultiple();" class="btn btn-sm btn-outline-danger margin-btn">Programar Multiple</button>';
+          html +='</div>';
+
+
+          html +='<div id="divMiltiple" class="col col-12 text-center" style="display:none;">';
 
           html +='<label for="finaliza" class="col-form-label col-sm-12"><span class="h5">Selecione los dias de la formación</span></label>';
           html +='<button id="btDia1" type="button" onClick="selDiaFormacion(1);" class="btn btn-secondary margin-btn">Lunes</button>' ;  
@@ -89,13 +96,10 @@ function programarFichas(idficha, idtrimestre){
           html +='<button id="btDia5" type="button" onClick="selDiaFormacion(5);" class="btn btn-secondary margin-btn">Viernes</button>' ;  
           html +='<button id="btDia6" type="button" onClick="selDiaFormacion(6);" class="btn btn-secondary margin-btn">Sabado</button>' ;  
           html +='<button id="btDia0" type="button" onClick="selDiaFormacion(0);" class="btn btn-secondary margin-btn">Domingo</button>' ;  
+          html +='  <div class="col-sm-12">' ;  
+          html +='    <button id="btEnviar" type="button" onClick="crearProgramacionMultiple();" class="btn btn-sm btn-outline-danger  margin-btn">Crear Programacion Multiple</button>' ;  
+          html +='  </div>';
           html +='</div>';
-
-          html +='<div class="bs-callout bs-callout-warning text-center">';
-          html +='<button type="button" onClick="verHorarios();" class="btn btn-sm btn-outline-success margin-btn">Consultar Calendario</button>';
-          html +='<button id="btEnviar" type="button" onClick="crearProgramacionMultiple();" class="btn btn-sm btn-outline-success margin-btn">Crear Programacion</button>' ;  
-          html +='</div>';
-
 
           html +='</div>';
           html +='</div>';
@@ -114,6 +118,22 @@ function programarFichas(idficha, idtrimestre){
     $('#cuerpo').html(html); 
      llenarfinaliza(6);   
      //programacion(idficha, idtrimestre);                             
+}
+
+
+function mostrarOcultarMultiple(){
+
+  var textBot = $("#btMult").text();
+
+  if(textBot =="Programar Multiple" ){
+    $("#btMult").text("Ocultar Multiple");
+    $("#divMiltiple").show("fast");
+  }else{
+    $("#btMult").text("Programar Multiple");
+    $("#divMiltiple").hide("fast");
+
+  }
+
 }
 
 function selDiaFormacion(diaSel){
@@ -142,81 +162,90 @@ function selDiaFormacion(diaSel){
 
 function crearProgramacionMultiple(){
 
-  
-  //cargamos los valores del instructor y el resultado
-  var idInstructor = $("#lIdInstructor").text();
-  var esTitulada = 1;
-  var esMultiple = 1;
 
-  var idResultado = JSON.stringify(listaIDSResultadoSel);
-  var idCompetencia = JSON.stringify(listaIDSCompeteSel);
-  var diasSemana = JSON.stringify(listaDiasSel);
+  if(validarParametrosBusqueda()){
 
-  
-  var inicia = $("#inicia").val();
-  var finaliza = $("#finaliza").val();
-  var parametros = {
-      dato:'calendario',
-      request:'sel',
-      idficha:$("#lIdficha").text(),
-      inicia:inicia,
-      finaliza:finaliza,
-      ano:0,
-      mes:0,
-      dia: 0,
-      ds:diasSemana,
-      festivo:0,
-      //se agregan dos parametros
-      idResultado: idResultado,
-      idInstructor:idInstructor,
-      idCompetencia:idCompetencia,
-      textCompetencia:'',
-      textResultado:'',
-      esTitulada:esTitulada,
-      esMultiple:esMultiple
-     }
-      $.ajax({
-      url: '../views/com/formacioncom.php',
-      type:'POST',
-      dataType:'html', //tipo de data que retornaf
-      data:parametros,
-      timeout: 600000 // sets timeout to 10 minutos
-      }).done(function(data){ //donde se ejecuta al terminar la ejecucion del archivo php  
-       var datosRecibidos = JSON.parse(data);  
-        $('#btnnficha').attr('disabled', false);                  
-        $.each(datosRecibidos, function(key,value){ 
-        html = '';    
-        switch(value.respuesta){   
-            case '0':
-               aCommand: toastr["info"]("No hay cambios registrados"); 
-               break;                  
-            case '1':
-                // var boton = '';
-                // boton +='<button id="d'+mes+'_'+dia+'" ';
-                // boton +='onClick="unselCalendario('+idficha+','+ano+','+mes+','+dia+','+ds+','+inicia+','+finaliza+','+festivo+')"';
-                // boton +=' class="btn btn-outline-default btn-sm" ';
-                // boton +=' type="button">'+dia+' <i class="far fa-calendar-times"></i></button>';            
-                // $('#b'+mes+'_'+dia).html(boton); 
-                // // programacion(idficha, idtrimestre);     
-                // //programacion(idficha, 0);   
+    
 
+    
+    
+    //cargamos los valores del instructor y el resultado
+    var idInstructor = $("#lIdInstructor").text();
+    var esTitulada = 1;
+    var esMultiple = 1;
+
+    var idResultado = JSON.stringify(listaIDSResultadoSel);
+    var idCompetencia = JSON.stringify(listaIDSCompeteSel);
+    var diasSemana = JSON.stringify(listaDiasSel);
+
+    
+    var inicia = $("#inicia").val();
+    var finaliza = $("#finaliza").val();
+    var parametros = {
+        dato:'calendario',
+        request:'sel',
+        idficha:$("#lIdficha").text(),
+        inicia:inicia,
+        finaliza:finaliza,
+        ano:0,
+        mes:0,
+        dia: 0,
+        ds:diasSemana,
+        festivo:0,
+        //se agregan dos parametros
+        idResultado: idResultado,
+        idInstructor:idInstructor,
+        idCompetencia:idCompetencia,
+        textCompetencia:'',
+        textResultado:'',
+        esTitulada:esTitulada,
+        esMultiple:esMultiple
+      }
+        $.ajax({
+        url: '../views/com/formacioncom.php',
+        type:'POST',
+        dataType:'html', //tipo de data que retornaf
+        data:parametros,
+        timeout: 600000 // sets timeout to 10 minutos
+        }).done(function(data){ //donde se ejecuta al terminar la ejecucion del archivo php  
+        var datosRecibidos = JSON.parse(data);  
+          $('#btnnficha').attr('disabled', false);                  
+          $.each(datosRecibidos, function(key,value){ 
+          html = '';    
+          switch(value.respuesta){   
+              case '0':
+                aCommand: toastr["info"]("No hay cambios registrados"); 
+                break;                  
+              case '1':
+                  // var boton = '';
+                  // boton +='<button id="d'+mes+'_'+dia+'" ';
+                  // boton +='onClick="unselCalendario('+idficha+','+ano+','+mes+','+dia+','+ds+','+inicia+','+finaliza+','+festivo+')"';
+                  // boton +=' class="btn btn-outline-default btn-sm" ';
+                  // boton +=' type="button">'+dia+' <i class="far fa-calendar-times"></i></button>';            
+                  // $('#b'+mes+'_'+dia).html(boton); 
+                  // // programacion(idficha, idtrimestre);     
+                  // //programacion(idficha, 0);   
+
+                  swal("Resultado...", value.label, "info");    
+
+                  verHorarios();
+                break;     
+              case '2':
                 swal("Resultado...", value.label, "info");    
 
-                verHorarios();
-               break;     
-            case '2':
-              swal("Resultado...", value.label, "info");    
+                verHorarios();  
+                break;                                        
+              case '5':
+                //frmlogin();
+                break;
+            }   
+          }); 
 
-              verHorarios();  
-               break;                                        
-            case '5':
-               //frmlogin();
-               break;
-           }   
-        }); 
-
-    }); 
-  
+      }); 
+      
+    }else{
+      swal("Datos incompletos!", "Por favor primero selecciones el instructor, la ficha y el resultado", "warning");  
+    }
 
 }
 

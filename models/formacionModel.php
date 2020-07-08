@@ -2384,9 +2384,20 @@ public function selCalendario($datos){
 						$ds = date("w", mktime(0, 0, 0, $mes, $dia, $ano));
 					}
 
+					$mesSQL = date("n",$fechainiciof);
+							$diaSQL = date("d",$fechainiciof);
+							$anoSQL = date("Y",$fechainiciof);
+
+					$fechaSQLini = $anoSQL.'-'.$mesSQL.'-'.$diaSQL;
+
+					$mesSQL = date("n",$fechafinf);
+							$diaSQL = date("d",$fechafinf);
+							$anoSQL = date("Y",$fechafinf);
+
+					$fechaSQLfin = $anoSQL.'-'.$mesSQL.'-'.$diaSQL;
 
 					// Se realiza validacion para verificar que ese dia, la programacion este disponible en todo el trimestre
-					$sqlValCruces = "select COUNT(*) as programados from programacion  where (idficha = '$idficha'  OR idinstructor ='$idInstructor') and ( ( (inicia <= '$inicia' and finaliza > '$inicia' ) OR (inicia < '$finaliza' and finaliza >= '$finaliza') ) OR (inicia > '$inicia' and finaliza < '$finaliza') )  AND (fecha BETWEEN '$fechainiciof' AND '$fechafinf') AND diasemana = '$ds' AND estado = '1';";
+					$sqlValCruces = "select COUNT(*) as programados from programacion  where (idficha = '$idficha'  OR idinstructor ='$idInstructor') and ( ( (inicia <= '$inicia' and finaliza > '$inicia' ) OR (inicia < '$finaliza' and finaliza >= '$finaliza') ) OR (inicia > '$inicia' and finaliza < '$finaliza') )  AND (fecha BETWEEN '$fechaSQLini' AND '$fechaSQLfin') AND diasemana = '$ds' AND estado = '1';";
 
 									
 					$stmt2 = Conexion::conectar()->prepare($sqlValCruces);
@@ -2398,6 +2409,12 @@ public function selCalendario($datos){
 						}
 					}
 
+					/*
+					echo '<script>';
+				  echo 'console.log('. json_encode( $sqlValCruces ) .')';
+				  echo '</script>';
+				
+				  /**/ 
 
 					$textoDia ="";
 					if($numCruces >0){

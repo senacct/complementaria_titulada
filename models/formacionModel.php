@@ -2632,16 +2632,15 @@ public function unselCalendario($datos){
 		$textResultado = $datos['textResultado'];
 	}
 
+	$sqlt = "";
 	if(!$esTitulada){
 
 		$sqlt = "INSERT INTO programacion (idficha, inicia, finaliza, ano, mes, dia, diasemana, festivo, ip, estado, idinstructor, idResultado, desResultado, idCompetencia, desCompetencia)  VALUES ('$idficha','$inicia','$finaliza','$ano', '$mes', '$dia', '$diasemana', '$festivo', '$ip', '$estado', '$idInstructor', '$idResultado', '$textResultado', '$idCompetencia', '$textCompetencia') ON DUPLICATE KEY  UPDATE  estado = '$estado' , idinstructor = '$idInstructor', idResultado = '$idResultado', desResultado = '$textResultado', idCompetencia = '$idCompetencia', desCompetencia = '$textCompetencia'";
 
 	}else{
-		$sqlt .="INSERT INTO programacion (idficha, inicia, finaliza, ano, mes, dia, diasemana, festivo, ip, fecha, estado, horas, idinstructor)  VALUES ('$idficha','$inicia','$finaliza','$ano', '$mes', '$dia', '$ds', '$festivo', '$ip', '$fecha', '$estado', '$horas', '$idInstructor') ON DUPLICATE KEY  UPDATE  estado = '$estado' , idinstructor = '$idInstructor'; " .
+		$sqlt .="INSERT INTO programacion (idficha, inicia, finaliza, ano, mes, dia, diasemana, festivo, ip, estado, idinstructor)  VALUES ('$idficha','$inicia','$finaliza','$ano', '$mes', '$dia', '$diasemana', '$festivo', '$ip',  '$estado',  '$idInstructor') ON DUPLICATE KEY  UPDATE  estado = '$estado' , idinstructor = '$idInstructor'; " .
 
-								"select @idProgramacion := ID from programacion where idficha = '$idficha' AND inicia = '$inicia' AND finaliza = '$finaliza' AND ano = '$ano' AND mes ='$mes' AND dia = '$dia' AND diasemana = '$ds' AND festivo = '$festivo' AND ip = '$ip' AND fecha = '$fecha' AND estado = '$estado' AND horas = '$horas' AND idinstructor = '$idInstructor'; " .
-
-								"DELETE FROM programacion_resultados WHERE idProgramacion = @idProgramacion; " ;
+								"select @idProgramacion := ID from programacion where idficha = '$idficha' AND inicia = '$inicia' AND finaliza = '$finaliza' AND ano = '$ano' AND mes ='$mes' AND dia = '$dia' AND diasemana = '$diasemana' AND festivo = '$festivo' AND ip = '$ip' AND estado = '$estado' AND idinstructor = '$idInstructor'; DELETE FROM programacion_resultados WHERE idProgramacion = @idProgramacion; " ;
 	}
 
 		$stmt = Conexion::conectar()->prepare($sqlt);
@@ -2659,6 +2658,13 @@ $newdata =  array (
 );
 $arrDatos[] = $newdata;
 echo json_encode($arrDatos);
+/*
+
+					echo '<script>';
+				  echo 'console.log('. json_encode( $sqlt ) .')';
+				  echo '</script>';*/
+				
+				  
 }
 
 public function traerFestivo($ano, $mes, $day){

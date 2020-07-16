@@ -18,12 +18,12 @@ Class Titulada{
 	    $respuesta = TituladaController::listaResultados($id);
  		return $respuesta;
 	}	
-	public function verHinstructor($id,$idFicha,$vinculacion,$modificar){
-	    $respuesta = TituladaController::verHinstructor($id,$idFicha,$vinculacion,$modificar);
+	public function verHinstructor($id,$idFicha,$vinculacion,$modificar,$trimestreSel,$anoSel){
+	    $respuesta = TituladaController::verHinstructor($id,$idFicha,$vinculacion,$modificar,$trimestreSel,$anoSel);
  		return $respuesta;
 	}	
-	public function verHficha($id,$idFicha,$modificar){
-	    $respuesta = TituladaController::verHficha($id,$idFicha,$modificar);
+	public function verHficha($id,$idFicha,$modificar,$trimestreSel,$anoSel){
+	    $respuesta = TituladaController::verHficha($id,$idFicha,$modificar,$trimestreSel,$anoSel);
  		return $respuesta;
 	}	
 	public function lprogresultado(){
@@ -103,14 +103,19 @@ switch ($dato) {
 				$idFicha = filter_input(INPUT_POST,'idFicha');
 				$vinculacion = filter_input(INPUT_POST,'vinculacion');
 				$modificar = filter_input(INPUT_POST,'modificar');
-				echo $a->verHinstructor($id,$idFicha, $vinculacion, $modificar); 			
+				$trimestreSel = filter_input(INPUT_POST,'trimestreSel');
+				$anoSel = filter_input(INPUT_POST,'anoSel');
+
+				echo $a->verHinstructor($id,$idFicha, $vinculacion, $modificar,$trimestreSel,$anoSel); 			
 			break;	
 			case 'verHficha':
 			    $id = filter_input(INPUT_POST,'id');
 				$idFicha = filter_input(INPUT_POST,'idFicha');
 				$modificar = filter_input(INPUT_POST,'modificar');
+				$trimestreSel = filter_input(INPUT_POST,'trimestreSel');
+				$anoSel = filter_input(INPUT_POST,'anoSel');
 				
-				echo $a->verHficha($id,$idFicha,$modificar); 			
+				echo $a->verHficha($id,$idFicha,$modificar,$trimestreSel,$anoSel); 			
 			break;			
 			case 'update':
 			$error = 0;

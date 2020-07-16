@@ -16,13 +16,18 @@ class TituladaModel{
  } 
 
 /****************************/
-public static function verHinstructor($id, $idFicha,$vinculacion,$modificar){
+public static function verHinstructor($id, $idFicha,$vinculacion,$modificar,$trimestreSel = 0,$anoSel = 0){
 $f = new TituladaModel(); 
 
 $ip = $_SERVER["REMOTE_ADDR"]; 
 date_default_timezone_set('America/Bogota'); 
 
-$dtrimestre = $f -> dtrimestre();
+if($anoSel != 0 && $trimestreSel != 0){
+	$dtrimestre = $f -> dtrimestreSel($anoSel,$trimestreSel);
+}else{
+	$dtrimestre = $f -> dtrimestre();
+}
+
 $fechainicio = $dtrimestre['fechainicio'];
 $fechafin = $dtrimestre['fechafin'];
 $fechainiciof = strtotime($fechainicio);
@@ -139,12 +144,12 @@ for ($m = $mesInicio; $m < $mesFin + 1; $m++) {
 									$dato .= ' type="button"> Consultar Resultados <i class="fas fa-list-ol"></i></button>';            
 
 								
-								// $dato .= $value['desCompetencia'].'<br>';
-								// $dato .= $value['desResultado'];
+								 $dato .= $value['desCompetencia'].'<br>';
+								 $dato .= $value['desResultado'];
 
 								if($modificar == 1){
 									$dato .= '<button id="d'.$value['mes'].'_'.$value['dia'].'_'.$value['inicia'].'_'.$value['finaliza'].'" ';
-									$dato .= 'onClick="unselCalendario('.$value['id'].','.$year.','.$m.','.$day.','.$ds.','.$value['inicia'].','.$value['finaliza'].','.$festivo.','.$value['idResultado'].','.$value['idCompetencia'].',\''.$value['desResultado'].'\',\''.$value['desResultado'].'\')"';
+									$dato .= 'onClick="unselCalendario('.$value['id'].','.$year.','.$m.','.$day.','.$ds.','.$value['inicia'].','.$value['finaliza'].','.$festivo.','.$value['idResultado'].','.$value['idCompetencia'].',\''.$value['desResultado'].'\',\''.$value['desResultado'].'\',\'1\')"';
 									$dato .= ' class="btn btn-outline-default btn-sm text-white" ';
 									$dato .= ' type="button"> Quitar <i class="far fa-calendar-times  "></i></button>';            
 								}
@@ -198,17 +203,25 @@ return $html;
 }
 
 /****************************/
-public static function verHficha($id, $idFicha,$modificar){
+public static function verHficha($id, $idFicha,$modificar,$trimestreSel= 0 ,$anoSel= 0){
 	$f = new TituladaModel(); 
 	
 	$ip = $_SERVER["REMOTE_ADDR"]; 
 	date_default_timezone_set('America/Bogota'); 
 	
-	$dtrimestre = $f -> dtrimestre();
+	if($anoSel != 0 && $trimestreSel != 0){
+		$dtrimestre = $f -> dtrimestreSel($anoSel,$trimestreSel);
+	}else{
+		$dtrimestre = $f -> dtrimestre();
+	}
+
+
+	//$dtrimestre = $f -> dtrimestre();
 	$fechainicio = $dtrimestre['fechainicio'];
 	$fechafin = $dtrimestre['fechafin'];
 	$fechainiciof = strtotime($fechainicio);
 	$fechafinf = strtotime($fechafin);
+	
 	
 	$fechahoy = date("Y-m-d");  
 	$mesInicio = date("n",$fechainiciof);
@@ -302,13 +315,13 @@ public static function verHficha($id, $idFicha,$modificar){
 									$dato .= ' class="btn btn-primary text-white" ';
 									$dato .= ' type="button"> Consultar Resultados <i class="fas fa-list-ol"></i></button>';  
 									
-									//   $dato .= $value['desCompetencia'].'<br>';
-									//   $dato .= $value['desResultado'];
+									  $dato .= $value['desCompetencia'].'<br>';
+									  $dato .= $value['desResultado'];
 
 									  
 									  if($modificar == 1){
 											$dato .= '<button id="d'.$value['mes'].'_'.$value['dia'].'_'.$value['inicia'].'_'.$value['finaliza'].'" ';
-											$dato .= 'onClick="unselCalendario('.$idFicha.','.$year.','.$m.','.$day.','.$ds.','.$value['inicia'].','.$value['finaliza'].','.$festivo.','.$value['idResultado'].','.$value['idCompetencia'].',\''.$value['desResultado'].'\',\''.$value['desResultado'].'\')"';
+											$dato .= 'onClick="unselCalendario('.$idFicha.','.$year.','.$m.','.$day.','.$ds.','.$value['inicia'].','.$value['finaliza'].','.$festivo.','.$value['idResultado'].','.$value['idCompetencia'].',\''.$value['desResultado'].'\',\''.$value['desResultado'].'\',\'1\')"';
 											$dato .= ' class="btn btn-outline-default btn-sm text-white" ';
 											$dato .= ' type="button"> Quitar <i class="far fa-calendar-times "></i></button>'.'<hr>';            
 									  }
@@ -1358,6 +1371,25 @@ $sqlt = "SELECT fechainicio, fechafin FROM trimestres WHERE estado = '1'";
 	}
 return $respuesta;			
 }
+
+public static function dtrimestreSel($ano,$trimestre){
+	$respuesta = [];	
+	$sqlt = "SELECT fechainicio, fechafin FROM trimestres WHERE ano = '$ano' AND `trimestre` = '$trimestre'";
+		$stmt = Conexion::conectar()->prepare($sqlt);
+		$stmt -> execute();
+		if($stmt->rowCount() > 0){
+			$registros = $stmt->fetchAll();
+			foreach ($registros as $key => $value){
+			$fechainicio = $value['fechainicio'];
+			 $fechafin = $value['fechafin'];
+			$respuesta = [
+				'fechainicio' => $fechainicio,
+				'fechafin' => $fechafin
+				];	
+			}
+		}
+	return $respuesta;			
+	}
 
 
 

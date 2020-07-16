@@ -1164,7 +1164,7 @@ function selCalendario(idficha, ano, mes, dia, ds, festivo){
             case '1':
                 var boton = '';
                 boton +='<button id="d'+mes+'_'+dia+'" ';
-                boton +='onClick="unselCalendario('+idficha+','+ano+','+mes+','+dia+','+ds+','+inicia+','+finaliza+','+festivo +','+esTitulada+')"';
+                boton +='onClick="unselCalendario('+idficha+','+ano+','+mes+','+dia+','+ds+','+inicia+','+finaliza+','+festivo +',"" , "",'+esTitulada+')"';
                 boton +=' class="btn btn-outline-default btn-sm" ';
                 boton +=' type="button">'+dia+' <i class="far fa-calendar-times"></i></button>';            
                 $('#b'+mes+'_'+dia).html(boton); 

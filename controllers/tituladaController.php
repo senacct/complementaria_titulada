@@ -60,12 +60,12 @@ class TituladaController{
 	    $respuesta =  TituladaModel::activarlresultados($id);
  		return $respuesta;
 	}	
-	public function verHinstructor($id,$idFicha,$vinculacion,$modificar){
-	    $respuesta = TituladaModel::verHinstructor($id,$idFicha,$vinculacion,$modificar);
+	public function verHinstructor($id,$idFicha,$vinculacion,$modificar,$trimestreSel,$anoSel){
+	    $respuesta = TituladaModel::verHinstructor($id,$idFicha,$vinculacion,$modificar,$trimestreSel,$anoSel);
  		return $respuesta;
 	}					
-	public function verHficha($id,$idFicha,$modificar){
-	    $respuesta = TituladaModel::verHficha($id,$idFicha,$modificar);
+	public function verHficha($id,$idFicha,$modificar,$trimestreSel,$anoSel){
+	    $respuesta = TituladaModel::verHficha($id,$idFicha,$modificar,$trimestreSel,$anoSel);
  		return $respuesta;
 	}				 	 		 
 }

@@ -30,6 +30,37 @@ function programarFichas(){
           html +='</div>';
           html +='</div>';  
 
+          html +='<div class="row">';  
+
+          html +='            <div class="col col-12 col-md-6">';
+          html +='              <label class="col-sm-12 col-form-label">Año</label>';
+          html +='              <div class="input-group mb-3">';
+          html +='              <select id="añoTrimestre" class="custom-select">';
+          html +='                <option value="2020">2020</option>';
+          html +='              </select>';
+          html +='            <script>';
+          html +='            ';
+          html +='            </script> '; 
+          html +='               </div>  ';
+        html +='               </div>  ';
+
+          html +='            <div class="col col-12 col-md-6">';
+          html +='              <label class="col-sm-12 col-form-label">Trimestre</label>';
+          html +='              <div class="input-group mb-3">';
+          html +='              <select id="trimestre" class="custom-select">';
+          //html +='                <option value="1">1</option>';
+          html +='                <option value="2">2</option>';
+          html +='                <option value="3">3</option>';
+          //html +='                <option value="4">4</option>';
+          html +='              </select>';
+          html +='            <script>';
+          html +='            ';
+          html +='            </script> '; 
+          html +='               </div>  ';
+        html +='               </div>  ';
+
+          html +='          </div>'; 
+
           html +='<div class="bs-callout bs-callout-info"><label style="display:none;" id="lIdficha"></label><p id="lficha"></p></div>';
           html +='<div class="bs-callout bs-callout-danger"><label style="display:none;" id="lIdInstructor"></label><label style="display:none;" id="lTVInstructor"></label><p id="linstructor"></p></div>';          
 
@@ -39,11 +70,16 @@ function programarFichas(){
           
     //resetDias(idficha,idtrimestre);
     $('#cuerpo').html(html); 
+
      //programacion(idficha, idtrimestre);                             
 }
 
 
 function verHinstructor(idinstructor){
+
+  var trimestreSel = $("#trimestre").val();
+  var anoSel = $("#añoTrimestre").val();
+
   
     var parametros = {
       'dato':'titulada',
@@ -51,7 +87,9 @@ function verHinstructor(idinstructor){
       'id':idinstructor,
       'idFicha':$('#lIdficha').text(),
       vinculacion:$('#lTVInstructor').text(),
-      modificar:0
+      modificar:0,
+      trimestreSel:trimestreSel,
+      anoSel:anoSel
     }
     $.ajax({ //inicia la funcion ajax
     type:"POST", //tipo de envio: post o get como en un formulario web
@@ -68,12 +106,17 @@ function verHinstructor(idinstructor){
 
 function verHficha(idFicha){
 
+  var trimestreSel = $("#trimestre").val();
+  var anoSel = $("#añoTrimestre").val();
+
   var parametros = {
     'dato':'titulada',
     'request':'verHficha',
     'id':idFicha,
     'idFicha':idFicha,
-    modificar:0
+    modificar:0,
+    trimestreSel:trimestreSel,
+    anoSel:anoSel
   }
   $.ajax({ //inicia la funcion ajax
   type:"POST", //tipo de envio: post o get como en un formulario web
@@ -308,3 +351,87 @@ function vervtnmodal(){
   html +='</div>';
   $('#placemodal').html(html);          
   }
+
+
+  
+function verResultadosHorario(idProgramacion, puedeModificar){
+
+  var html = '';  
+     html +=' <div class="table-responsive">';
+     html +='  <table id="resultadosSel" class="table table-sm table-bordered table-striped">';
+     html +='     <thead>';
+     html +='         <tr>';
+     html +='         <th>CODIGO</th>';        
+     html +='         <th>COMPETENCIA</th>';   
+     html +='         <th>RESULTADO</th>'; 
+     html +='         </tr>';
+     html +='     </thead>';
+     html +='     <tbody>';
+     html +='     </tbody>';
+     html +='    </table>';
+     html +='   </div>';
+     vervtnmodal();  
+     $('#myModalLabel').html('RESULTADOS');
+     $('#bodymodal').html(html);
+     $('#myModal').modal('show'); 
+    var table = $('#resultadosSel').DataTable( {
+     responsive: true,
+     autoWidth: false,
+         columnDefs: [
+             { responsivePriority: 1, targets: 0 },
+             { responsivePriority: 2, targets: -1 } 
+         ],
+     bDeferRender: true,     
+     sPaginationType: "full_numbers",
+     ajax: {
+       url: "../../views/com/tituladacom.php",
+       type: "POST",
+       data:{
+          'dato':'titulada',
+          'request':'lresultadoPro',
+          'idProgramacion':idProgramacion ,
+          'modificar':puedeModificar
+        },  
+     },    
+ columns: [
+     { "data": "codigo"},
+     { "data": "competencia"},    
+     { "data": "resultado"},
+   ],
+ "autoWidth": false,
+     "responsive" : true,
+   
+ "oLanguage": {
+     "sProcessing": "Procesando...",
+     "sLengthMenu": 'Mostrar <select>'+
+         '<option value="10">10</option>'+
+         '<option value="20">20</option>'+
+         '<option value="30">30</option>'+
+         '<option value="40">40</option>'+
+         '<option value="50">50</option>'+
+         '<option value="-1">All</option>'+
+         '</select> registros',    
+             "sZeroRecords":    "No se encontraron resultados",
+             "sEmptyTable":     "Ningún dato disponible en esta tabla",
+             "sInfo":           "Mostrando del (_START_ al _END_) de un total de _TOTAL_ registros",
+             "sInfoEmpty":      "Mostrando del 0 al 0 de un total de 0 registros",
+             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+             "sInfoPostFix":    "",
+             "sSearch":         "Filtrar:",
+             "sUrl":            "",
+             "sInfoThousands":  ",",
+             "sLoadingRecords": "Por favor espere - cargando...",
+             "oPaginate": {
+                 "sFirst":    "Primero",
+                 "sLast":     "Último",
+                 "sNext":     "Siguiente",
+                 "sPrevious": "Anterior"
+             },
+         "oAria": {
+         "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+         "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+       } 
+     },
+   }); 
+
+}

@@ -37,7 +37,7 @@ function programarFichas(){
           html +='              <div class="input-group mb-3">';
           html +='              <select id="añoTrimestre" class="custom-select">';
           html +='                <option value="2020">2020</option>';
-          html +='                <option value="2020">2021</option>';
+          // html +='                <option value="2020">2021</option>';
           html +='              </select>';
           html +='            <script>';
           html +='            ';

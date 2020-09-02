@@ -133,19 +133,21 @@ for ($m = $mesInicio; $m < $mesFin + 1; $m++) {
 							$classColor = 'bg-danger';
 						}
 
-                            $dato .='<strong> FICHA: </strong> ' . $value['numero'].'<br>  <strong> Horario: </strong> '.$value['inicia'].':00 -'.$value['finaliza'].':00 <br> <strong> Ambiente: </strong> '.$value['lugar'].'<br>';
+                            $dato .='<strong> Horario: </strong> '.$value['inicia'].':00 -'.$value['finaliza'].':00 <br> <strong> Ambiente: </strong> '.$value['lugar'].'<br> <strong> FICHA: </strong> ' . $value['numero'].'<br> ';
 							if($value['nivel'] == '0' ){
 								$dato .= $value['nombre'].'<hr>';
 							}else{
+								$dato .= $value['nombre'].'<br>';
 								
 								$dato .= '<button id="res'.$value['mes'].'_'.$value['dia'].'_'.$value['inicia'].'_'.$value['finaliza'].'" ';
 									$dato .= 'onClick="verResultadosHorario('.$value['idProgramacion'].','.$modificar.')"';
 									$dato .= ' class="btn btn-primary text-white" ';
 									$dato .= ' type="button"> Consultar Resultados <i class="fas fa-list-ol"></i></button>';            
 
-								
-								 $dato .= $value['desCompetencia'].'<br>';
-								 $dato .= $value['desResultado'];
+									
+									$dato .= $value['desCompetencia'].'<br>';
+									$dato .= $value['desResultado'];
+								 
 
 								if($modificar == 1){
 									$dato .= '<button id="d'.$value['mes'].'_'.$value['dia'].'_'.$value['inicia'].'_'.$value['finaliza'].'" ';
@@ -303,13 +305,12 @@ public static function verHficha($id, $idFicha,$modificar,$trimestreSel= 0 ,$ano
 								}
 
 								if($value['mes'] == $m && $value['dia'] == $day){
-									$dato .= '<strong> FICHA: </strong> ' . $value['numero'].'<br>  <strong> Horario: </strong> '.$value['inicia'].':00 -'.$value['finaliza'].':00 <br> <strong> Ambiente: </strong> '.$value['lugar'].'<br>';
 									$dato .= 'Instructor: '.$value['instructor'].'<br>';
-									  
+									$dato .= '<strong> Horario: </strong> '.$value['inicia'].':00 -'.$value['finaliza'].':00 <br> <strong> Ambiente: </strong> '.$value['lugar'].'<br> <strong> FICHA: </strong> ' . $value['numero'].'<br>';
 								  if($value['nivel'] == '0' ){
 									  $dato .= $value['nombre'].'<hr>';
 								  }else{
-									  
+									$dato .= $value['nombre'].'<br>';
 									$dato .= '<button id="resf'.$value['mes'].'_'.$value['dia'].'_'.$value['inicia'].'_'.$value['finaliza'].'" ';
 									$dato .= 'onClick="verResultadosHorario('.$value['idProgramacion'].','.$modificar.')"';
 									$dato .= ' class="btn btn-primary text-white" ';

@@ -37,6 +37,7 @@ function programarFichas(){
           html +='              <div class="input-group mb-3">';
           html +='              <select id="añoTrimestre" class="custom-select">';
           html +='                <option value="2020">2020</option>';
+          html +='                <option value="2020">2021</option>';
           html +='              </select>';
           html +='            <script>';
           html +='            ';
@@ -48,10 +49,10 @@ function programarFichas(){
           html +='              <label class="col-sm-12 col-form-label">Trimestre</label>';
           html +='              <div class="input-group mb-3">';
           html +='              <select id="trimestre" class="custom-select">';
-          //html +='                <option value="1">1</option>';
+          html +='                <option value="1">1</option>';
           html +='                <option value="2">2</option>';
           html +='                <option value="3">3</option>';
-          //html +='                <option value="4">4</option>';
+          html +='                <option value="4">4</option>';
           html +='              </select>';
           html +='            <script>';
           html +='            ';
